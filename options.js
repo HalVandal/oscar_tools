@@ -55,3 +55,70 @@ if (searchModeSelect) {
   setupDropdown('defaultSearchMode', searchModeSelect);
 }
 
+// Dynamic tooltip functionality - works with multiple tooltip elements
+function setupTooltips() {
+  const tooltips = [
+    {
+      id: 'smartSearchTooltip',
+      content: `
+        <strong>Smart Search automatically detects what you're searching for</strong><br><br>
+        &bull; <strong>Numbers (123456)</strong> &rarr; Demographic # Search<br>
+        &bull; <strong>Names (John Doe)</strong> &rarr; Name Search<br>
+        &bull; <strong>Phone (123-456-7890)</strong> &rarr; Phone Search<br>
+        &bull; <strong>Date (1990-01-15)</strong> &rarr; DOB Search<br>
+        &bull; <strong>10 digits (1234567890)</strong> &rarr; HIN Search<br><br>
+        Just start typing and the search mode will switch automatically!
+      `
+    },
+    {
+      id: 'classicLoginTooltip',
+      content: `
+        <strong>Classic Login automatically redirects from new interface</strong><br><br>
+        No more manual switching between interfaces!
+      `
+    }
+  ];
+
+  tooltips.forEach(tooltipConfig => {
+    const tooltipIcon = document.getElementById(tooltipConfig.id);
+    if (!tooltipIcon) return;
+    
+    let tooltip = null;
+    
+    tooltipIcon.addEventListener('mouseenter', function(e) {
+      // Create tooltip
+      tooltip = document.createElement('div');
+      tooltip.className = 'dynamic-tooltip';
+      tooltip.innerHTML = tooltipConfig.content;
+      
+      // Position tooltip
+      const rect = tooltipIcon.getBoundingClientRect();
+      tooltip.style.left = (rect.right + 10) + 'px';
+      tooltip.style.top = (rect.top - 10) + 'px';
+      
+      // Add to body and show
+      document.body.appendChild(tooltip);
+      setTimeout(() => tooltip.classList.add('show'), 10);
+    });
+    
+    tooltipIcon.addEventListener('mouseleave', function() {
+      if (tooltip) {
+        tooltip.classList.remove('show');
+        setTimeout(() => {
+          if (tooltip && tooltip.parentNode) {
+            tooltip.parentNode.removeChild(tooltip);
+          }
+          tooltip = null;
+        }, 300);
+      }
+    });
+  });
+}
+
+// Initialize tooltips when DOM is ready
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', setupTooltips);
+} else {
+  setupTooltips();
+}
+

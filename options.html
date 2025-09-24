@@ -101,8 +101,10 @@ input:checked + .slider:before {
   border-radius: 15px;
   padding: 20px;
   margin: 20px 0;
+  z-index:8000;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
   transition: all 0.3s ease;
+  overflow: visible;
 }
 
 .main-option:hover {
@@ -213,6 +215,57 @@ input:checked + .slider:before {
   font-weight: 600;
 }
 
+/* Tooltip and icon styling */
+.tooltip-icon {
+  display: inline-block;
+  margin-left: 10px;
+  cursor: help;
+  font-size: 18px;
+  color: #00ff88;
+  text-shadow: 0 0 10px rgba(0, 255, 136, 0.5);
+  transition: all 0.3s ease;
+}
+
+.tooltip-icon:hover {
+  color: #00d4ff;
+  text-shadow: 0 0 15px rgba(0, 212, 255, 0.7);
+  transform: scale(1.1);
+}
+
+/* Dynamic tooltip that gets appended to body */
+.dynamic-tooltip {
+  position: fixed;
+  width: 300px;
+  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+  color: #00d4ff;
+  text-align: left;
+  border-radius: 10px;
+  padding: 15px;
+  z-index: 999999;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  border: 2px solid rgba(0, 212, 255, 0.3);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(10px);
+  font-size: 14px;
+  line-height: 1.4;
+  pointer-events: none;
+}
+
+.dynamic-tooltip.show {
+  opacity: 1;
+}
+
+.dynamic-tooltip::after {
+  content: "";
+  position: absolute;
+  top: 20px;
+  left: -10px;
+  border-width: 8px;
+  border-style: solid;
+  border-color: transparent rgba(0, 212, 255, 0.3) transparent transparent;
+}
+
 
 </style>
 
@@ -224,6 +277,7 @@ input:checked + .slider:before {
     <span class="slider round"></span>
   </label>
   <span class="option-label glow">Enable Classic Login</span>
+  <span class="tooltip-icon" id="classicLoginTooltip">&#128161;</span>
 </div>
 
 <div class="main-option">
@@ -305,6 +359,7 @@ input:checked + .slider:before {
     <span class="slider round"></span>
   </label>
   <span class="option-label glow">Enable Smart Search</span>
+  <span class="tooltip-icon" id="smartSearchTooltip">&#128161;</span>
 </div>
 
 
@@ -345,5 +400,6 @@ input:checked + .slider:before {
 </div>
 
 <script src="options.js"></script>
+
 </body>
 </html>
