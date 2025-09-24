@@ -4,9 +4,7 @@ const tabExclusions = document.getElementById('tabExclusions');
 
 function setTabExclusionsDisabled(disabled) {
   const inputs = tabExclusions.querySelectorAll('input')
-
   inputs.forEach(input => input.disabled = disabled)
-
 
 }
 
@@ -35,4 +33,25 @@ toggleTabs.addEventListener('change', function() {
   inputs.forEach(input => input.disabled = !toggleTabs.checked)
 
 });
+
+// Setup dropdown for search mode
+function setupDropdown(storageKey, selectElement) {
+  // Load saved value
+  chrome.storage.sync.get([storageKey], function(result) {
+    if (result[storageKey]) {
+      selectElement.value = result[storageKey];
+    }
+  });
+  
+  // Save when changed
+  selectElement.addEventListener('change', function() {
+    chrome.storage.sync.set({ [storageKey]: selectElement.value });
+  });
+}
+
+// Setup the search mode dropdown
+const searchModeSelect = document.querySelector('.searchModeOptions');
+if (searchModeSelect) {
+  setupDropdown('defaultSearchMode', searchModeSelect);
+}
 

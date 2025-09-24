@@ -3,9 +3,9 @@
   "name": "OSCAR PLUS",
   "version": "1.0",
   "description": "A tool for OSCAR PRO EMR.",
-  "permissions": ["webNavigation","tabs","storage"],
+  "permissions": ["webNavigation","tabs","storage","activeTab","scripting"],
   "host_permissions": [
-    "*://*.kai.oscar.com/*"
+    "*://*.kai-oscar.com/*"
   ],
   "options_page": "options.html",
   "background": {
