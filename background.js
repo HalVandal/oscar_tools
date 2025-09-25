@@ -1,7 +1,8 @@
-
+var exclusions = [];
 
 chrome.webNavigation.onCompleted.addListener(function(details) {
-  if (details.url.includes("kaiemr/") && !details.url.includes("inbox")) {   // If more exceptions arise like inbox, I may need to re-work this logic
+  var lastNine = details.url.slice(-9)
+  if (lastNine == "kaiemr/#/") {
     chrome.storage.sync.get(['toggleClassicURL'], function(result) {
       if (!result.toggleClassicURL) return; // Do nothing if disabled
           const urlObj = new URL(details.url);
@@ -12,7 +13,7 @@ chrome.webNavigation.onCompleted.addListener(function(details) {
     });
   }
   //Lets see if they're going to the search page
-  if (details.url.includes("search.jsp")) {
+  if (details.url.includes("search.jsp") || details.url.includes("demographiccontrol.jsp")) {
     chrome.storage.sync.get(['toggleSmartSearch', 'toggleDefaultSearch', 'defaultSearchMode'], function (result) {
       if (result.toggleDefaultSearch) {
         const defaultMode = result.toggleDefaultSearch && result.defaultSearchMode ? result.defaultSearchMode : 'search_name';
@@ -22,8 +23,7 @@ chrome.webNavigation.onCompleted.addListener(function(details) {
             args: [defaultMode], // Pass the mode as an argument
             func: (searchMode) => {
               const searchModeSelect = document.getElementsByName('search_mode')[0];
-              const searchBar = document.getElementById('keyword') || document.querySelector('input[name="keyword"]') || document.querySelector('input[type="text"]');
-              
+
               // Set default search mode
               if (searchModeSelect) {
                 searchModeSelect.value = searchMode;
@@ -33,9 +33,6 @@ chrome.webNavigation.onCompleted.addListener(function(details) {
           }
 
       if (result.toggleSmartSearch) {
-      
-      // Get the default search mode from options
-      const defaultMode = result.toggleDefaultSearch && result.defaultSearchMode ? result.defaultSearchMode : 'search_name';
       
       // Inject script into the page to access the DOM and add smart search
       chrome.scripting.executeScript({
@@ -125,19 +122,7 @@ chrome.windows.onCreated.addListener(function(newWindow) {
       chrome.tabs.query({windowId: newWindow.id}, function(tabs) {
         tabs.forEach(function(tab) {
           chrome.tabs.onUpdated.addListener(function listener(tabId, changeInfo, updatedTab) {
-            if (tabId === tab.id && updatedTab.url && updatedTab.url.includes('kai-oscar')) {
-              // Collect all exclusions that are enabled (checked)
-              console.log(updatedTab.url)
-              const exclusions = [];
-                if (result.toggleEchartTabs) exclusions.push('forward.jsp');
-                if (result.toggleAdminTabs) exclusions.push('administration');
-                if (result.toggleSearchTabs) exclusions.push('search.jsp');
-                if (result.toggleInboxTabs) exclusions.push('inbox');
-                if (result.toggleEformTabs) exclusions.push('/eform');
-                if (result.toggleTicklerTabs) exclusions.push('/tickler');
-                if (result.toggleDocumentTabs) exclusions.push('/document');
-                if (result.toggleHRMTabs) exclusions.push('/hrm');
-                if (result.toggleLabsTabs) exclusions.push('/lab');             
+            if (tabId === tab.id && updatedTab.url && updatedTab.url.includes('kai-oscar')) {             
               // If any exclusion matches, skip opening the tab
               let excluded = false;
               for (let i = 0; i < exclusions.length; i++) {
@@ -163,3 +148,40 @@ chrome.windows.onCreated.addListener(function(newWindow) {
     }
   });
 });
+
+
+function updateTabExclusionTable() {
+  chrome.storage.sync.get(null, function(result) {
+    // Collect all exclusions that are enabled (checked)
+    exclusions = [];
+      if (result.toggleEchartTabs) exclusions.push('forward.jsp');
+      if (result.toggleAdminTabs) exclusions.push('administration');
+      if (result.toggleSearchTabs) exclusions.push('search.jsp');
+      if (result.toggleInboxTabs) exclusions.push('inbox');
+      if (result.toggleEformTabs) exclusions.push('/eform');
+      if (result.toggleTicklerTabs) exclusions.push('/tickler');
+      if (result.toggleDocumentTabs) exclusions.push('/document');
+      if (result.toggleHRMTabs) exclusions.push('/hrm');
+      if (result.toggleLabsTabs) exclusions.push('/lab');
+  });
+}
+
+// Listen for storage changes and update exclusions when tab settings change
+chrome.storage.onChanged.addListener(function(changes, namespace) {
+  // Check if any tab exclusion settings changed
+  const tabExclusionKeys = [
+    'toggleEchartTabs', 'toggleAdminTabs', 'toggleSearchTabs', 
+    'toggleInboxTabs', 'toggleEformTabs', 'toggleTicklerTabs',
+    'toggleDocumentTabs', 'toggleHRMTabs', 'toggleLabsTabs'
+  ];
+  
+  const hasTabExclusionChange = tabExclusionKeys.some(key => changes[key]);
+  
+  if (hasTabExclusionChange) {
+    console.log('Tab exclusion settings changed, updating exclusions array');
+    updateTabExclusionTable();
+  }
+});
+
+updateTabExclusionTable();
+

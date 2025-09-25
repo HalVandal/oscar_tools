@@ -7,7 +7,7 @@
 /* Futuristic dark theme */
 body {
   background: linear-gradient(135deg, #0f0f0f 0%, #1a1a2e 50%, #16213e 100%);
-  color: #00d4ff;
+  color: #4a9cc7;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   padding: 30px;
   min-height: 100vh;
@@ -16,10 +16,10 @@ body {
 }
 
 h1 {
-  color: #00ff88;
+  color: #4a9c7c;
   text-align: center;
   font-weight: 300;
-  text-shadow: 0 0 20px rgba(0, 255, 136, 0.5);
+  text-shadow: 0 0 15px rgba(74, 156, 124, 0.3);
   margin-bottom: 40px;
 }
 
@@ -65,15 +65,15 @@ h1 {
 }
 
 input:checked + .slider {
-  background: linear-gradient(45deg, #00d4ff, #0099cc);
-  border-color: #00d4ff;
-  box-shadow: 0 4px 20px rgba(0, 212, 255, 0.4), inset 0 1px 3px rgba(255, 255, 255, 0.2);
+  background: linear-gradient(45deg, #4a9cc7, #367aa3);
+  border-color: #4a9cc7;
+  box-shadow: 0 4px 20px rgba(74, 156, 199, 0.3), inset 0 1px 3px rgba(255, 255, 255, 0.2);
 }
 
 input:checked + .slider:before {
   transform: translateX(30px);
   background: linear-gradient(45deg, #fff, #f0f8ff);
-  box-shadow: 0 2px 12px rgba(0, 212, 255, 0.6);
+  box-shadow: 0 2px 12px rgba(74, 156, 199, 0.4);
 }
 
 .slider.round {
@@ -89,7 +89,7 @@ input:checked + .slider:before {
   margin-left: 10px;
   font-size: 16px;
   font-weight: 500;
-  text-shadow: 0 0 10px rgba(0, 212, 255, 0.3);
+  text-shadow: 0 0 8px rgba(74, 156, 199, 0.2);
   vertical-align: middle;
 }
 
@@ -97,7 +97,7 @@ input:checked + .slider:before {
 .main-option {
   background: rgba(255, 255, 255, 0.05);
   backdrop-filter: blur(10px);
-  border: 1px solid rgba(0, 212, 255, 0.2);
+  border: 1px solid rgba(74, 156, 199, 0.15);
   border-radius: 15px;
   padding: 20px;
   margin: 20px 0;
@@ -108,8 +108,8 @@ input:checked + .slider:before {
 }
 
 .main-option:hover {
-  border-color: rgba(0, 212, 255, 0.4);
-  box-shadow: 0 12px 40px rgba(0, 212, 255, 0.1);
+  border-color: rgba(74, 156, 199, 0.3);
+  box-shadow: 0 12px 40px rgba(74, 156, 199, 0.08);
 }
 
 /* Tab exclusions styling */
@@ -119,7 +119,7 @@ input:checked + .slider:before {
   background: rgba(0, 0, 0, 0.2);
   border-radius: 12px;
   width:50%;
-  border: 1px solid rgba(0, 255, 136, 0.2);
+  border: 1px solid rgba(74, 156, 124, 0.15);
 }
 
 .tabExclusions table {
@@ -129,15 +129,15 @@ input:checked + .slider:before {
 
 .tabExclusions td {
   background: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(0, 212, 255, 0.15);
+  border: 1px solid rgba(74, 156, 199, 0.12);
   border-radius: 8px;
   padding: 12px;
   transition: all 0.3s ease;
 }
 
 .tabExclusions td:hover {
-  background: rgba(0, 212, 255, 0.1);
-  border-color: rgba(0, 212, 255, 0.3);
+  background: rgba(74, 156, 199, 0.08);
+  border-color: rgba(74, 156, 199, 0.25);
   transform: translateY(-2px);
 }
 
@@ -153,7 +153,7 @@ input:checked + .slider:before {
 .tabExclusions input[type="checkbox"] {
   margin-right: 10px;
   transform: scale(1.2);
-  accent-color: #00ff88;
+  accent-color: #4a9c7c;
 }
 
 /* Disabled state styling */
@@ -170,8 +170,8 @@ input:checked + .slider:before {
 /* Dropdown menu styling */
 .searchModeOptions {
   background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
-  color: #00d4ff;
-  border: 2px solid rgba(0, 212, 255, 0.3);
+  color: #4a9cc7;
+  border: 2px solid rgba(74, 156, 199, 0.25);
   border-radius: 10px;
   padding: 12px 16px;
   font-size: 14px;
@@ -186,31 +186,31 @@ input:checked + .slider:before {
 }
 
 .searchModeOptions:hover {
-  border-color: rgba(0, 212, 255, 0.5);
-  box-shadow: 0 6px 20px rgba(0, 212, 255, 0.2);
+  border-color: rgba(74, 156, 199, 0.4);
+  box-shadow: 0 6px 20px rgba(74, 156, 199, 0.15);
   transform: translateY(-2px);
 }
 
 .searchModeOptions:focus {
-  border-color: #00ff88;
-  box-shadow: 0 0 20px rgba(0, 255, 136, 0.3);
+  border-color: #4a9c7c;
+  box-shadow: 0 0 15px rgba(74, 156, 124, 0.25);
 }
 
 .searchModeOptions option {
   background: #1a1a2e;
-  color: #00d4ff;
+  color: #4a9cc7;
   padding: 10px;
   border: none;
   font-weight: 400;
 }
 
 .searchModeOptions option:hover {
-  background: rgba(0, 212, 255, 0.1);
-  color: #00ff88;
+  background: rgba(74, 156, 199, 0.08);
+  color: #4a9c7c;
 }
 
 .searchModeOptions option:checked {
-  background: linear-gradient(45deg, #00d4ff, #0099cc);
+  background: linear-gradient(45deg, #4a9cc7, #367aa3);
   color: #ffffff;
   font-weight: 600;
 }
@@ -221,14 +221,14 @@ input:checked + .slider:before {
   margin-left: 10px;
   cursor: help;
   font-size: 18px;
-  color: #00ff88;
-  text-shadow: 0 0 10px rgba(0, 255, 136, 0.5);
+  color: #4a9c7c;
+  text-shadow: 0 0 8px rgba(74, 156, 124, 0.4);
   transition: all 0.3s ease;
 }
 
 .tooltip-icon:hover {
-  color: #00d4ff;
-  text-shadow: 0 0 15px rgba(0, 212, 255, 0.7);
+  color: #4a9cc7;
+  text-shadow: 0 0 12px rgba(74, 156, 199, 0.5);
   transform: scale(1.1);
 }
 
@@ -237,14 +237,14 @@ input:checked + .slider:before {
   position: fixed;
   width: 300px;
   background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
-  color: #00d4ff;
+  color: #4a9cc7;
   text-align: left;
   border-radius: 10px;
   padding: 15px;
   z-index: 999999;
   opacity: 0;
   transition: opacity 0.3s ease;
-  border: 2px solid rgba(0, 212, 255, 0.3);
+  border: 2px solid rgba(74, 156, 199, 0.25);
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
   backdrop-filter: blur(10px);
   font-size: 14px;
@@ -263,7 +263,7 @@ input:checked + .slider:before {
   left: -10px;
   border-width: 8px;
   border-style: solid;
-  border-color: transparent rgba(0, 212, 255, 0.3) transparent transparent;
+  border-color: transparent rgba(74, 156, 199, 0.25) transparent transparent;
 }
 
 
