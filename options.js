@@ -5,24 +5,7 @@ const tabExclusions = document.getElementById('tabExclusions');
 function setTabExclusionsDisabled(disabled) {
   const inputs = tabExclusions.querySelectorAll('input')
   inputs.forEach(input => input.disabled = disabled)
-  updateTabExclusionTable();
-}
 
-// Update the visual state of the tab exclusion table
-function updateTabExclusionTable() {
-  const isTabsEnabled = toggleTabs.checked;
-  
-  if (isTabsEnabled) {
-    tabExclusions.classList.remove('disabled');
-  } else {
-    tabExclusions.classList.add('disabled');
-  }
-  
-  // Update individual checkbox states
-  const inputs = tabExclusions.querySelectorAll('input');
-  inputs.forEach(input => {
-    input.disabled = !isTabsEnabled;
-  });
 }
 
 // storageKey is the element id
@@ -47,12 +30,10 @@ document.querySelectorAll('input[type="checkbox"]').forEach(function(checkbox) {
 
 // Listen to see if tab exclusions need to be enabled/disabled
 toggleTabs.addEventListener('change', function() {
-  updateTabExclusionTable();
-});
+  const inputs = tabExclusions.querySelectorAll('input')
+  inputs.forEach(input => input.disabled = !toggleTabs.checked)
 
-// Listen for changes to individual tab exclusion checkboxes
-tabExclusions.addEventListener('change', function() {
-  updateTabExclusionTable();
+
 });
 
 
