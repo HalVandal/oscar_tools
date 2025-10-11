@@ -151,6 +151,34 @@ chrome.webNavigation.onCompleted.addListener(function(details) {
                 transform: scale(0.95);
                 background: linear-gradient(45deg, #357abd, #2968a3);
               }
+              .headerColor {
+                background: linear-gradient(135deg, #2c2c2c, #1a1a1a) !important;
+                color: white !important;
+                font-weight: bold !important;
+                text-shadow: 1px 1px 2px rgba(0,0,0,0.5) !important;
+                border: 1px solid #444 !important;
+              }
+              .rowColor1 {
+                background: #ffffff !important;
+                color: #333 !important;
+                border: 1px solid #ddd !important;
+              }
+              .rowColor1:hover {
+                background: #f8f9fa !important;
+              }
+              .rowColor2 {
+                background: #f5f5f5 !important;
+                color: #333 !important;
+                border: 1px solid #ddd !important;
+              }
+              .rowColor2:hover {
+                background: #e9ecef !important;
+              }
+              table {
+                border-collapse: collapse !important;
+                border-spacing: 0 !important;
+                box-shadow: 0 2px 4px rgba(0,0,0,0.1) !important;
+              }
             `;
             document.head.appendChild(styleElement);
             
