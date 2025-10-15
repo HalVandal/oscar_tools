@@ -200,7 +200,7 @@ chrome.webNavigation.onCompleted.addListener(function(details) {
                 queryText.innerHTML = 
 `SELECT plr.provider_no,concat(p.first_name,' ',p.last_name) as 'Provider', htm.type, MAX(htm.created) as latest_created
 FROM hl7TextMessage htm
-  LEFT JOIN providerLabRouting plr ON plr.lab_no = htm.lab_id
+  LEFT JOIN providerLabRouting plr ON plr.lab_no = htm.lab_id and plr.lab_type = 'HL7'
   LEFT JOIN provider p on p.provider_no = plr.provider_no
 WHERE plr.provider_no IS NOT NULL
   AND htm.created >= DATE_SUB(NOW(), INTERVAL 60 DAY)
@@ -665,6 +665,9 @@ function updateTabExclusionTable() {
       if (result.toggleHRMTabs) exclusions.push('/hrm');
       if (result.toggleLabsTabs) exclusions.push('/lab');
       if (result.toggleAttachmentManager) exclusions.push('/attachment-manager');
+      if (result.toggleMeasurements) exclusions.push('/oscarMeasurements');
+      if (result.toggleDiseaseRegistry) exclusions.push('/oscarDxResearch');
+      if (result.togglePreventions) exclusions.push('/oscarPrevention');
   });
 }
 
@@ -675,7 +678,8 @@ chrome.storage.onChanged.addListener(function(changes, namespace) {
     'toggleEchartTabs', 'toggleAdminTabs', 'toggleSearchTabs', 
     'toggleInboxTabs', 'toggleEformTabs', 'toggleTicklerTabs',
     'toggleDocumentTabs', 'toggleHRMTabs', 'toggleLabsTabs',
-    'toggleAttachmentManager'
+    'toggleAttachmentManager','toggleMeasurements','toggleDiseaseRegistry',
+    'togglePreventions'
   ];
   
   const hasTabExclusionChange = tabExclusionKeys.some(key => changes[key]);
