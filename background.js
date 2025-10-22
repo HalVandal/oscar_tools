@@ -134,7 +134,7 @@ chrome.webNavigation.onCompleted.addListener(function(details) {
 
 
           function checkQueryPage() {
-            if (!queryText) {
+            if (!queryFrame) {
               setTimeout(checkQueryPage, 1000);
               return;
             }
@@ -216,15 +216,30 @@ FROM ( SELECT p.provider_no, ROUND(COUNT(DISTINCT CONCAT(appointment_date, HOUR(
             const query2Button = document.createElement('button');
             query2Button.textContent = 'Recent Labs';
             query2Button.className = 'savedQueries';
-            query2Button.dataset.query = `SELECT plr.provider_no,concat(p.first_name,' ',p.last_name) as 'Provider', htm.type, MAX(htm.created) as latest_created
-FROM hl7TextMessage htm
-  LEFT JOIN providerLabRouting plr ON plr.lab_no = htm.lab_id and plr.lab_type = 'HL7'
-  LEFT JOIN provider p on p.provider_no = plr.provider_no
-WHERE plr.provider_no IS NOT NULL
-  AND htm.created >= DATE_SUB(NOW(), INTERVAL 60 DAY)
-  AND htm.created <= NOW()
-GROUP BY plr.provider_no, htm.type
-ORDER BY plr.provider_no,htm.created desc, htm.type;`;
+            query2Button.dataset.query = `SELECT main_query.provider_no,
+       main_query.Provider,
+       main_query.type,
+       main_query.latest_created,
+       main_query.lab_no,
+       palr.demographic_no
+FROM (
+    SELECT DISTINCT
+           plr.provider_no,
+           concat(p.first_name,' ',p.last_name) as 'Provider',
+           htm.type,
+           FIRST_VALUE(htm.created) OVER (PARTITION BY plr.provider_no, htm.type ORDER BY htm.created DESC) as latest_created,
+           FIRST_VALUE(plr.lab_no) OVER (PARTITION BY plr.provider_no, htm.type ORDER BY htm.created DESC) as lab_no
+    FROM hl7TextMessage htm
+      LEFT JOIN providerLabRouting plr ON plr.lab_no = htm.lab_id and plr.lab_type = 'HL7'
+      LEFT JOIN provider p on p.provider_no = plr.provider_no
+    WHERE plr.provider_no IS NOT NULL
+      AND htm.created >= DATE_SUB(NOW(), INTERVAL 60 DAY)
+      AND htm.created <= NOW()
+) main_query
+
+LEFT JOIN patientLabRouting palr ON palr.lab_no = main_query.lab_no and palr.lab_type = 'HL7'
+
+ORDER BY main_query.provider_no, main_query.latest_created desc, main_query.type;`;
             query2Button.onclick = insertQuery;
 
             // Generic insert function that reads query from button's data attribute
@@ -240,7 +255,7 @@ ORDER BY plr.provider_no,htm.created desc, htm.type;`;
             queryFrame.appendChild(query1Button)
             queryFrame.appendChild(query2Button)
 
-            if (customButtons.query1) {
+            if (customButtons.query1 && customButtons.query1_name && customButtons.query1_text) {
               const queryButton = document.createElement('button');
                 queryButton.textContent = customButtons.query1_name; 
                 queryButton.className = 'savedQueries';
@@ -249,7 +264,7 @@ ORDER BY plr.provider_no,htm.created desc, htm.type;`;
                 queryFrame.appendChild(queryButton)  
             }
             
-            if (customButtons.query2) {
+            if (customButtons.query2 && customButtons.query2_name && customButtons.query2_text) {
               const queryButton = document.createElement('button');
                 queryButton.textContent = customButtons.query2_name; 
                 queryButton.className = 'savedQueries';
@@ -257,7 +272,7 @@ ORDER BY plr.provider_no,htm.created desc, htm.type;`;
                 queryButton.onclick = insertQuery; 
                 queryFrame.appendChild(queryButton)  
             }
-            if (customButtons.query3) {
+            if (customButtons.query3 && customButtons.query3_name && customButtons.query3_text) {
               const queryButton = document.createElement('button');
                 queryButton.textContent = customButtons.query3_name;
                 queryButton.className = 'savedQueries';
@@ -265,7 +280,7 @@ ORDER BY plr.provider_no,htm.created desc, htm.type;`;
                 queryButton.onclick = insertQuery; 
                 queryFrame.appendChild(queryButton)  
             }
-            if (customButtons.query4) {
+            if (customButtons.query4 && customButtons.query4_name && customButtons.query4_text) {
               const queryButton = document.createElement('button');
                 queryButton.textContent = customButtons.query4_name;
                 queryButton.className = 'savedQueries';
@@ -273,7 +288,7 @@ ORDER BY plr.provider_no,htm.created desc, htm.type;`;
                 queryButton.onclick = insertQuery; 
                 queryFrame.appendChild(queryButton)  
             }
-            if (customButtons.query5) {
+            if (customButtons.query5 && customButtons.query5_name && customButtons.query5_text) {
               const queryButton = document.createElement('button');
                 queryButton.textContent = customButtons.query5_name;
                 queryButton.className = 'savedQueries';
