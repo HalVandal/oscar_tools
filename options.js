@@ -58,6 +58,37 @@ if (searchModeSelect) {
   setupDropdown('defaultSearchMode', searchModeSelect);
 }
 
+// Setup custom query fields
+function setupTextInput(storageKey, inputElement) {
+  // Load saved value
+  chrome.storage.sync.get([storageKey], function(result) {
+    if (result[storageKey]) {
+      inputElement.value = result[storageKey];
+    }
+  });
+  
+  // Save when changed (using input event for real-time saving)
+  inputElement.addEventListener('input', function() {
+    chrome.storage.sync.set({ [storageKey]: inputElement.value });
+  });
+}
+
+// Automatically setup all custom query inputs
+function setupCustomQueryInputs() {
+  // Find all inputs with IDs that match the pattern query{number}_{name|text}
+  const queryInputs = document.querySelectorAll('input[id^="query"], textarea[id^="query"]');
+  
+  queryInputs.forEach(input => {
+    // Only process inputs that match our naming pattern
+    if (input.id.match(/^query\d+_(name|text)$/)) {
+      setupTextInput(input.id, input);
+    }
+  });
+}
+
+// Initialize custom query inputs
+setupCustomQueryInputs();
+
 // Dynamic tooltip functionality - works with multiple tooltip elements
 function setupTooltips() {
   const tooltips = [
@@ -78,6 +109,20 @@ function setupTooltips() {
       content: `
         <strong>Classic Login automatically redirects from new interface</strong><br><br>
         No more manual switching between interfaces!
+      `
+    },
+    {
+      id: 'quickLinksToolTip',
+      content: `
+        Adds a menu to the <strong>Administration</strong> link<br><br>
+       Hover over or click the down arrow to expand the new menu!
+      `
+    },
+    {
+      id: 'savedQueriesToolTip',
+      content: `
+        Add buttons to the <strong>Query By Example</strong> page
+       that automatically adds your query to the text area!
       `
     }
   ];

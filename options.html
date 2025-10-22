@@ -113,35 +113,74 @@ input:checked + .slider:before {
 }
 
 /* Tab exclusions styling */
-.tabExclusions {
+.table1 {
   margin: 20px 0 0 0;
   padding: 20px;
   background: rgba(0, 0, 0, 0.2);
   border-radius: 12px;
-  width:50%;
-  border: 1px solid rgba(74, 156, 124, 0.15);
-}
-
-.tabExclusions table {
   width: 100%;
-  border-spacing: 15px;
+  border: 1px solid rgba(74, 156, 124, 0.15);
+  box-sizing: border-box;
 }
 
-.tabExclusions td {
+.table1 table {
+  width: calc(100% - 10px); /* account for 5px left + 5px right border-spacing */
+  border-spacing: 5px;
+  table-layout: fixed; /* ensure predictable cell widths */
+}
+
+
+/* Utilities: wrapper div to make a table's first column blend with the container */
+.header-col-wrap table tr > td:first-child,
+.header-col-wrap table tr > th:first-child {
+  background: transparent !important;
+  border-color: transparent !important;
+  box-shadow: none !important;
+  transform: none !important;
+}
+.header-col-wrap table tr > td:first-child:hover,
+.header-col-wrap table tr > th:first-child:hover {
+  background: transparent !important;
+  border-color: transparent !important;
+  transform: none !important;
+}
+
+/* 3-up layout utility: place wrappers side-by-side */
+/* Flex-based 3-up layout */
+.quicklinks-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  align-items: stretch;
+}
+
+.col-33 {
+  /* flex item: target 3 columns; subtract two gaps from row width */
+  flex: 1 1 calc((100% - 40px) / 3);
+  min-width: 260px; /* allows wrapping on smaller screens */
+  display: block;
+  box-sizing: border-box;
+}
+
+.table1 td {
   background: rgba(255, 255, 255, 0.03);
   border: 1px solid rgba(74, 156, 199, 0.12);
   border-radius: 8px;
-  padding: 12px;
+  padding: 5px;
   transition: all 0.3s ease;
+  word-break: break-word;
+  overflow-wrap: anywhere;
+
+
 }
 
-.tabExclusions td:hover {
+.table1 td:hover {
   background: rgba(74, 156, 199, 0.08);
   border-color: rgba(74, 156, 199, 0.25);
   transform: translateY(-2px);
 }
 
-.tabExclusions label {
+.table1 label {
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -150,21 +189,41 @@ input:checked + .slider:before {
   font-weight: 400;
 }
 
-.tabExclusions input[type="checkbox"] {
+
+.table1 h3 {
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  color: #a0a0ff;
+  font-size: 24px;
+  font-weight: 400;
+}
+
+
+.table1 input[type="checkbox"] {
   margin-right: 10px;
   transform: scale(1.2);
   accent-color: #4a9c7c;
 }
 
 /* Disabled state styling */
-.tabExclusions.disabled {
+.table1.disabled {
   opacity: 0.4;
   pointer-events: none;
 }
 
-.tabExclusions.disabled td {
+.table1.disabled td {
   background: rgba(100, 100, 100, 0.1);
   border-color: rgba(100, 100, 100, 0.2);
+}
+
+
+.table1.smallwidth td {
+  width: auto !important;
+    max-width: 150px !important;
+  min-width: 100px; /* Ensure minimum readable width */
+  padding: 8px 12px !important;
+  font-size: 12px !important;
 }
 
 /* Dropdown menu styling */
@@ -221,7 +280,7 @@ input:checked + .slider:before {
   margin-left: 10px;
   cursor: help;
   font-size: 18px;
-  color: #4a9c7c;
+  color: #4a9cc7;
   text-shadow: 0 0 8px rgba(74, 156, 124, 0.4);
   transition: all 0.3s ease;
 }
@@ -287,7 +346,7 @@ input:checked + .slider:before {
   </label>
   <span class="option-label glow">Open New Windows as Tabs</span>
   
-  <div class="tabExclusions" id="tabExclusions">
+  <div class="table1" id="tabExclusions">
     <table>
       <tr>
         <td>
@@ -427,7 +486,95 @@ input:checked + .slider:before {
          </select>
 </div>
 
+<div class="main-option">
+  <label class="switch">
+    <input type="checkbox" id="toggleQuickLinks">
+    <span class="slider round"></span>
+  </label>
+  <span class="option-label glow">Enable Quick Links Menu</span>
+  <span class="tooltip-icon" id="quickLinksToolTip">&#128161;</span>
+  <br />  
+    <div class="table1">
+      <h3>Choose links to add:</h3>
+      <table>
+        <tr>
+          <td><label>
+            <input type="checkbox" name="quickMenu_mcedt" id="quickMenu_mcedt"  value="">Billing > MCEDT Mailbox</label>
+          </td>
+        <tr>
+          <td><label>
+            <input type="checkbox" name="quickMenu_billingcorrections" id="quickMenu_billingcorrections"  value="">Billing > Billing Corrections (ON)</label>
+          </td>
+        </tr>
+        <tr>
+          <td><label>
+            <input type="checkbox" name="quickMenu_editInvoice" id="quickMenu_editInvoice"  value="">Billing > Edit Invoice (BC)</label>
+          </td>
+        </tr>
+        <tr>
+          <td><label>
+            <input type="checkbox" name="quickMenu_qbe" id="quickMenu_qbe"  value="">Reports > Query By Example</label>
+          </td>
+        </tr>
+        <tr>
+          <td><label>
+            <input type="checkbox" name="quickMenu_rbt" id="quickMenu_rbt"  value="">Reports > Report by Template</label>
+          </td>
+        </tr>
+        <tr>
+          <td><label>
+            <input type="checkbox" name="quickMenu_faxOutbox" id="quickMenu_faxOutbox"  value="">Electronic Faxing > Fax Outbox (Ring Central)</label>
+          </td>
+        </tr>
+        <tr>
+          <td><label>
+            <input type="checkbox" name="quickMenu_reload" id="quickMenu_reload"  value="">Updates and Migrations > Reload Configurations</label>
+          </td>
+        </tr>
+      </table>
+    </div>
+</div>
 
+
+<div class="main-option">
+  <span class="option-label glow">Saved Queries</span>
+  <span class="tooltip-icon" id="savedQueriesToolTip">&#128161;</span>
+
+    <div class="table1">
+      <table>
+        <tr>
+          <td>Enable
+            <label>
+              <input type="checkbox" name="query1" id="query1" style="margin:0px 20px 0 10px;">
+              Button Text: <input id="query1_name" type="text" width="200px" style="margin:0px 10px;"> 
+              SQL Text: <textarea id="query1_text" style="width: 60%;margin:10px 10px;"></textarea>
+            </label>
+            <label>
+              <input type="checkbox" name="query2" id="query2" style="margin:0px 20px 0 10px;">
+              Button Text: <input id="query2_name" type="text" width="200px" style="margin:0px 10px;"> 
+              SQL Text: <textarea id="query2_text" style="width: 60%;margin:10px 10px;"></textarea>
+          </label>           
+           <label>
+              <input type="checkbox" name="query3" id="query3" style="margin:0px 20px 0 10px;">
+              Button Text: <input id="query3_name" type="text" width="200px" style="margin:0px 10px;"> 
+              SQL Text: <textarea id="query3_text" style="width: 60%;margin:10px 10px;"></textarea>
+          </label>           
+           <label>
+              <input type="checkbox" name="query4" id="query4" style="margin:0px 20px 0 10px;">
+              Button Text: <input id="query4_name" type="text" width="200px" style="margin:0px 10px;"> 
+              SQL Text: <textarea id="query4_text" style="width: 60%;margin:10px 10px;"></textarea>
+          </label>           
+           <label>
+              <input type="checkbox" name="query5" id="query5" style="margin:0px 20px 0 10px;">
+              Button Text: <input id="query5_name" type="text" width="200px" style="margin:0px 10px;"> 
+              SQL Text: <textarea id="query5_text" style="width: 60%;margin:10px 10px;"></textarea>
+          </label>            
+          </td>
+      </table>
+    </div>
+
+
+</div>
 
 <script src="options.js"></script>
 
