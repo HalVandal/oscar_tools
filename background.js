@@ -1232,6 +1232,56 @@ ORDER BY main_query.provider_no, main_query.latest_created desc, main_query.type
     });
   }
 
+  //Billing Reconcilliation Page
+  if (details.url.includes("/servlet/oscar.DocumentUploadServlet")) {
+    chrome.scripting.executeScript({
+      target: { tabId: details.tabId },
+      func: () => { 
+       //We're going to add another 'Settle' link to this page so that any RA
+       //can be re-settled in the extension rather than resetting it via backend
+        
+        function waitForIFrame() {
+          const iFrame = document.getElementById('myFrame');
+          if (!iFrame) {
+            setTimeout(waitForIFrame, 1000);
+            return;
+          }
+          
+          // Check if iframe content is loaded
+          if (!iFrame.contentDocument) {
+            setTimeout(waitForIFrame, 1000);
+            return;
+          }
+          
+          // iFrame is loaded, now we scrape the Report link for RA number
+          const allLinks = iFrame.contentDocument.querySelectorAll('a');
+
+          allLinks.forEach(link => {
+            if (link.innerHTML.includes('Report')){
+              const raNumber = link.href.match(/rano=(\d+)/)
+              //Grab parent div of the report link so we can attach to it later
+              const parentDiv = link.parentNode
+
+              //Create the new Settle v2 link
+              const reprocessEle = document.createElement('a')
+              reprocessEle.innerHTML = 'Settle v2'
+              reprocessEle.href="#"
+              reprocessEle.style.cursor = 'pointer'
+              reprocessEle.setAttribute('onclick', `checkReconcile('../billing/CA/ON/onGenRAsettle.jsp?rano=${raNumber[1]}')`);
+              const textNode = document.createTextNode('| ')
+              //Attach it to the parent div
+                parentDiv.appendChild(textNode);
+                parentDiv.appendChild(reprocessEle);
+            }
+          });
+        }
+        
+        waitForIFrame();
+      }
+    });
+  }
+    
+
 }, {
   url: [{ hostSuffix: "oscar.com" }]
 });
