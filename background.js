@@ -139,8 +139,8 @@ chrome.webNavigation.onCompleted.addListener(function(details) {
               return;
             }
             
-            // Add style element for buttons and things
             const styleElement = document.createElement('style');
+            
             styleElement.textContent = `
               .savedQueries {
                 margin: 0px 5px 5px 0px;
@@ -162,7 +162,7 @@ chrome.webNavigation.onCompleted.addListener(function(details) {
                 color: white !important;
                 font-weight: bold !important;
                 text-shadow: 1px 1px 2px rgba(0,0,0,0.5) !important;
-                border: 1px solid #ffffffff !important;
+                border: 1px solid #ffffff !important;
               }
               .rowColor1 {
                 background: #ffffff !important;
@@ -250,7 +250,7 @@ ORDER BY main_query.provider_no, main_query.latest_created desc, main_query.type
                 queryText.innerHTML = query;
               }
             }
-
+            queryFrame.appendChild(document.createElement('br'));
             queryFrame.appendChild(qLabel)
             queryFrame.appendChild(query1Button)
             queryFrame.appendChild(query2Button)
