@@ -196,21 +196,53 @@ chrome.webNavigation.onCompleted.addListener(function(details) {
             const query1Button = document.createElement('button');
             query1Button.textContent = 'Provider Hours';
             query1Button.className = 'savedQueries';
-            query1Button.dataset.query = `SELECT CONCAT(p.last_name, ', ', p.first_name) AS Provider, p.specialty, ROUND(COUNT(DISTINCT CONCAT(appointment_date, HOUR(start_time)))/3, 2) AS Hours
+            query1Button.dataset.query = `SELECT 
+    CONCAT(p.last_name, ', ', p.first_name) AS Provider,
+    p.ohip_no AS "Billing Number",
+    p.status AS "Status",
+    p.specialty AS Specialty,
+    ROUND(COUNT(DISTINCT CONCAT(a.appointment_date, HOUR(a.start_time))) / 3, 2) AS Hours
 FROM appointment a
-LEFT JOIN provider p ON a.provider_no = p.provider_no
-WHERE demographic_no > 0 AND a.provider_no LIKE '%'
-   AND appointment_date >= DATE_FORMAT(DATE_SUB(NOW(), INTERVAL 90 DAY), '%Y-%m-%d')
-   AND appointment_date <= DATE_FORMAT(NOW(), '%Y-%m-%d')
-GROUP BY p.provider_no, p.last_name, p.first_name, p.specialty UNION ALL
-SELECT CONCAT(COUNT( CASE WHEN Hours >= 64 THEN 1 END), " Full Time" ), CONCAT(COUNT( CASE WHEN Hours BETWEEN 32 AND 63.99 THEN 1 END ), " Part Time"), CONCAT(ROUND(COUNT( CASE WHEN Hours < 32 THEN 1 END ),0), " Casual")
-FROM ( SELECT p.provider_no, ROUND(COUNT(DISTINCT CONCAT(appointment_date, HOUR(start_time))), 2) AS Hours
-   FROM appointment a
-   LEFT JOIN provider p ON a.provider_no = p.provider_no
-   WHERE demographic_no > 0 AND a.provider_no LIKE '%'
-       AND appointment_date >= DATE_FORMAT(DATE_SUB(NOW(), INTERVAL 30 DAY), '%Y-%m-%d') -- Adjusted to the last 30 days for monthly calculation
-       AND appointment_date <= DATE_FORMAT(NOW(), '%Y-%m-%d')
-   GROUP BY p.provider_no ) AS MonthlyHours;`;
+LEFT JOIN provider p 
+    ON a.provider_no = p.provider_no
+WHERE a.demographic_no > 0
+  AND a.provider_no LIKE '%'
+  AND a.appointment_date >= DATE_FORMAT(DATE_SUB(NOW(), INTERVAL 90 DAY), '%Y-%m-%d')
+  AND a.appointment_date <= DATE_FORMAT(NOW(), '%Y-%m-%d')
+  AND p.ohip_no IS NOT NULL
+  AND p.ohip_no <> ''
+  AND p.status <> 0
+GROUP BY 
+    p.provider_no,
+    p.last_name,
+    p.first_name,
+    p.ohip_no,
+    p.status,
+    p.specialty
+ 
+UNION ALL
+ 
+SELECT 
+    CONCAT(COUNT(CASE WHEN Hours >= 64 THEN 1 END), ' Full Time'),
+    '',
+    '',
+    CONCAT(COUNT(CASE WHEN Hours BETWEEN 32 AND 63.99 THEN 1 END), ' Part Time'),
+    CONCAT(ROUND(COUNT(CASE WHEN Hours < 32 THEN 1 END), 0), ' Casual')
+FROM (
+    SELECT 
+        p.provider_no,
+        ROUND(COUNT(DISTINCT CONCAT(a.appointment_date, HOUR(a.start_time))), 2) AS Hours
+    FROM appointment a
+    LEFT JOIN provider p 
+        ON a.provider_no = p.provider_no
+    WHERE a.demographic_no > 0
+      AND a.appointment_date >= DATE_FORMAT(DATE_SUB(NOW(), INTERVAL 30 DAY), '%Y-%m-%d')
+      AND a.appointment_date <= DATE_FORMAT(NOW(), '%Y-%m-%d')
+      AND p.ohip_no IS NOT NULL
+      AND p.ohip_no <> ''
+      AND p.status <> 0
+    GROUP BY p.provider_no
+) AS MonthlyHours;`;
             query1Button.onclick = insertQuery;
 
             const query2Button = document.createElement('button');
@@ -1361,4 +1393,5 @@ chrome.storage.onChanged.addListener(function(changes, namespace) {
 });
 
 updateTabExclusionTable();
+
 
