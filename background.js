@@ -1057,14 +1057,18 @@ ORDER BY main_query.provider_no, main_query.latest_created desc, main_query.type
 
                                 //The formatting for this (extra lines, not indented) is on purpose
                                 const scriptText = `
-    function SignForm() {
-    var provNum = $('#current_user_id').val();
-    var signatureElements = Array.from(document.querySelectorAll('[id*=signature]'));
-    for (var i = 0; i < signatureElements.length; i++){
-        signatureElements[i].src = "../eform/displayImage.do?imagefile=consult_sig_"+provNum+".png";
-        signatureElements[i].alt= provNum;
+function SignForm() {
+    var provNum = document.getElementById('current_user_id').value;
+    var signatureElements = document.querySelectorAll('img[id*="signature"]');
+
+    for (var i = 0; i < signatureElements.length; i++) {
+        signatureElements[i].src = "../eform/displayImage.do?imagefile=consult_sig_" + provNum + ".png";
+        signatureElements[i].onerror = function() {
+            this.style.display = 'none';
+        };
+        signatureElements[i].alt = provNum;
     }
-    }
+}
     `; 
 
                                 // Create a text node to help preserve formatting
@@ -1393,5 +1397,6 @@ chrome.storage.onChanged.addListener(function(changes, namespace) {
 });
 
 updateTabExclusionTable();
+
 
 
