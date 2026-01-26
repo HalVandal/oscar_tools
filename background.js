@@ -210,8 +210,6 @@ WHERE a.demographic_no > 0
   AND a.appointment_date >= DATE_FORMAT(DATE_SUB(NOW(), INTERVAL 90 DAY), '%Y-%m-%d')
   AND a.appointment_date <= DATE_FORMAT(NOW(), '%Y-%m-%d')
   AND p.ohip_no IS NOT NULL
-  AND p.ohip_no <> ''
-  AND p.status <> 0
 GROUP BY 
     p.provider_no,
     p.last_name,
@@ -219,9 +217,7 @@ GROUP BY
     p.ohip_no,
     p.status,
     p.specialty
- 
 UNION ALL
- 
 SELECT 
     CONCAT(COUNT(CASE WHEN Hours >= 64 THEN 1 END), ' Full Time'),
     '',
@@ -239,8 +235,6 @@ FROM (
       AND a.appointment_date >= DATE_FORMAT(DATE_SUB(NOW(), INTERVAL 30 DAY), '%Y-%m-%d')
       AND a.appointment_date <= DATE_FORMAT(NOW(), '%Y-%m-%d')
       AND p.ohip_no IS NOT NULL
-      AND p.ohip_no <> ''
-      AND p.status <> 0
     GROUP BY p.provider_no
 ) AS MonthlyHours;`;
             query1Button.onclick = insertQuery;
@@ -1397,6 +1391,7 @@ chrome.storage.onChanged.addListener(function(changes, namespace) {
 });
 
 updateTabExclusionTable();
+
 
 
 
