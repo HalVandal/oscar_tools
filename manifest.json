@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Oscar Tools",
-  "version": "1.3.0",
+  "version": "1.4.0",
   "key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEArlupEC+tMoVZKWfxaafquTBSK15o6Jiqhb9Svx2XbrHmZjapxYCyvMckj5vUmk3ooBfAyoPcw8HSBokwiyXaX2q8T/g+jn/ZA6h4JQ7jwx1AWYa3QXg6p8GUwK9UXDhRNtc0/o7jY0q7+URss9XN/XHSGGuzkwHafpzcV5gItTFQ5Sv9b1m3sfMHEEiK+Aa9JLhI6NYhf6w2Q3bd9DrXNpaSOVC/UXS7CWVCtu4R3rFXiT6DLfjWZJoSh/zn/2kxBEzHvfEivYAK3GATl/XaidsD7cmyaiPdipw7se8X/uoroXPVhErXheYhza5P0wiGn8n4h4TeT8I0ch9mj3PwCwIDAQAB",
   "description": "A tool for OSCAR PRO EMR.",
   "icons": {
