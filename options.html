@@ -325,6 +325,48 @@ input:checked + .slider:before {
   border-color: transparent rgba(74, 156, 199, 0.25) transparent transparent;
 }
 
+/* Saved Queries buttons */
+.add-query-btn {
+  background: linear-gradient(45deg, #4a9cc7, #367aa3);
+  color: #fff;
+  border: 1px solid #4a9cc7;
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(74, 156, 199, 0.25);
+  transition: all 0.15s ease;
+}
+.add-query-btn:hover {
+  background: linear-gradient(45deg, #5badd6, #4a9cc7);
+  box-shadow: 0 4px 14px rgba(74, 156, 199, 0.45);
+  transform: translateY(-1px);
+}
+.add-query-btn:active {
+  transform: translateY(0);
+  box-shadow: 0 1px 4px rgba(74, 156, 199, 0.3);
+}
+
+.delete-query-btn {
+  background: transparent;
+  color: #d97a7a;
+  border: 1px solid rgba(217, 122, 122, 0.5);
+  padding: 4px 10px;
+  border-radius: 4px;
+  font-size: 12px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+.delete-query-btn:hover {
+  background: rgba(217, 122, 122, 0.15);
+  color: #ff9999;
+  border-color: #d97a7a;
+  box-shadow: 0 0 8px rgba(217, 122, 122, 0.3);
+}
+.delete-query-btn:active {
+  background: rgba(217, 122, 122, 0.25);
+}
 
 </style>
 
@@ -541,36 +583,8 @@ input:checked + .slider:before {
   <span class="tooltip-icon" id="savedQueriesToolTip">&#128161;</span>
 
     <div class="table1">
-      <table>
-        <tr>
-          <td>Enable
-            <label>
-              <input type="checkbox" name="query1" id="query1" style="margin:0px 20px 0 10px;">
-              Button Text: <input id="query1_name" type="text" width="200px" style="margin:0px 10px;"> 
-              SQL Text: <textarea id="query1_text" style="width: 60%;margin:10px 10px;"></textarea>
-            </label>
-            <label>
-              <input type="checkbox" name="query2" id="query2" style="margin:0px 20px 0 10px;">
-              Button Text: <input id="query2_name" type="text" width="200px" style="margin:0px 10px;"> 
-              SQL Text: <textarea id="query2_text" style="width: 60%;margin:10px 10px;"></textarea>
-          </label>           
-           <label>
-              <input type="checkbox" name="query3" id="query3" style="margin:0px 20px 0 10px;">
-              Button Text: <input id="query3_name" type="text" width="200px" style="margin:0px 10px;"> 
-              SQL Text: <textarea id="query3_text" style="width: 60%;margin:10px 10px;"></textarea>
-          </label>           
-           <label>
-              <input type="checkbox" name="query4" id="query4" style="margin:0px 20px 0 10px;">
-              Button Text: <input id="query4_name" type="text" width="200px" style="margin:0px 10px;"> 
-              SQL Text: <textarea id="query4_text" style="width: 60%;margin:10px 10px;"></textarea>
-          </label>           
-           <label>
-              <input type="checkbox" name="query5" id="query5" style="margin:0px 20px 0 10px;">
-              Button Text: <input id="query5_name" type="text" width="200px" style="margin:0px 10px;"> 
-              SQL Text: <textarea id="query5_text" style="width: 60%;margin:10px 10px;"></textarea>
-          </label>            
-          </td>
-      </table>
+      <div id="savedQueriesList" style="padding: 10px;"></div>
+      <button type="button" id="addSavedQueryBtn" class="add-query-btn" style="margin: 10px;">+ Add Query</button>
     </div>
 
 

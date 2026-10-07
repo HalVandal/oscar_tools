@@ -7,6 +7,45 @@
 
 var exclusions = [];
 
+// Saved queries: dynamic list. Storage layout matches options.js:
+//   savedQueries_ids: [id, ...]
+//   sq_<id>: { name, sql, enabled }
+// Legacy query1..query5 keys are migrated once. legacy_N ids make the migration
+// idempotent so a concurrent run on a synced device can't create duplicates.
+function migrateLegacySavedQueries(done) {
+  chrome.storage.sync.get(['savedQueries_migrated'], function(flag) {
+    if (flag.savedQueries_migrated) { done(); return; }
+    chrome.storage.sync.get(null, function(all) {
+      const ids = Array.isArray(all.savedQueries_ids) ? all.savedQueries_ids.slice() : [];
+      const writes = {};
+      for (let i = 1; i <= 5; i++) {
+        const name = all['query' + i + '_name'] || '';
+        const sql = all['query' + i + '_text'] || '';
+        if (!name && !sql) continue;
+        const id = 'legacy_' + i;
+        if (!ids.includes(id)) ids.push(id);
+        writes['sq_' + id] = { name: name, sql: sql, enabled: !!all['query' + i] };
+      }
+      writes.savedQueries_ids = ids;
+      writes.savedQueries_migrated = true;
+      chrome.storage.sync.set(writes, done);
+    });
+  });
+}
+
+function loadSavedQueriesForInjection(callback) {
+  migrateLegacySavedQueries(function() {
+    chrome.storage.sync.get(['savedQueries_ids'], function(result) {
+      const ids = result.savedQueries_ids || [];
+      if (ids.length === 0) { callback([]); return; }
+      const keys = ids.map(id => 'sq_' + id);
+      chrome.storage.sync.get(keys, function(entries) {
+        callback(ids.map(id => entries['sq_' + id]).filter(Boolean));
+      });
+    });
+  });
+}
+
 chrome.webNavigation.onCompleted.addListener(function(details) {
   //console.log(details.url)
   var lastNine = details.url.slice(-9)
@@ -120,14 +159,11 @@ chrome.webNavigation.onCompleted.addListener(function(details) {
 
   // Query By Example page
   if (details.url.includes("RptByExample.do")) {
-    chrome.storage.sync.get(['query1','query1_name','query1_text','query2','query2_name','query2_text',
-      'query3','query3_name','query3_text','query4','query4_name','query4_text','query4','query4_name','query4_text',
-      'query5','query5_name','query5_text'
-    ], function(result) {
+    loadSavedQueriesForInjection(function(savedQueries) {
     chrome.scripting.executeScript({
         target: { tabId: details.tabId, frameIds: [details.frameId] },
-        args:[result],
-        func: (customButtons) => {     
+        args:[savedQueries],
+        func: (savedQueries) => {
           //var queryFrame = document.getElementById('scrollNumber1');
           var queryFrame = document.getElementsByClassName('MainTableRightColumn')[0];  
           var queryText = document.getElementsByName('sql')[0];     
@@ -287,47 +323,15 @@ ORDER BY main_query.provider_no, main_query.latest_created desc, main_query.type
             queryFrame.appendChild(query1Button)
             queryFrame.appendChild(query2Button)
 
-            if (customButtons.query1 && customButtons.query1_name && customButtons.query1_text) {
+            savedQueries.forEach(function(q) {
+              if (!q || !q.enabled || !q.name || !q.sql) return;
               const queryButton = document.createElement('button');
-                queryButton.textContent = customButtons.query1_name; 
-                queryButton.className = 'savedQueries';
-                queryButton.dataset.query = customButtons.query1_text; 
-                queryButton.onclick = insertQuery; 
-                queryFrame.appendChild(queryButton)  
-            }
-            
-            if (customButtons.query2 && customButtons.query2_name && customButtons.query2_text) {
-              const queryButton = document.createElement('button');
-                queryButton.textContent = customButtons.query2_name; 
-                queryButton.className = 'savedQueries';
-                queryButton.dataset.query = customButtons.query2_text; 
-                queryButton.onclick = insertQuery; 
-                queryFrame.appendChild(queryButton)  
-            }
-            if (customButtons.query3 && customButtons.query3_name && customButtons.query3_text) {
-              const queryButton = document.createElement('button');
-                queryButton.textContent = customButtons.query3_name;
-                queryButton.className = 'savedQueries';
-                queryButton.dataset.query = customButtons.query3_text;
-                queryButton.onclick = insertQuery; 
-                queryFrame.appendChild(queryButton)  
-            }
-            if (customButtons.query4 && customButtons.query4_name && customButtons.query4_text) {
-              const queryButton = document.createElement('button');
-                queryButton.textContent = customButtons.query4_name;
-                queryButton.className = 'savedQueries';
-                queryButton.dataset.query = customButtons.query4_text;
-                queryButton.onclick = insertQuery; 
-                queryFrame.appendChild(queryButton)  
-            }
-            if (customButtons.query5 && customButtons.query5_name && customButtons.query5_text) {
-              const queryButton = document.createElement('button');
-                queryButton.textContent = customButtons.query5_name;
-                queryButton.className = 'savedQueries';
-                queryButton.dataset.query = customButtons.query5_text;
-                queryButton.onclick = insertQuery; 
-                queryFrame.appendChild(queryButton)  
-            }
+              queryButton.textContent = q.name;
+              queryButton.className = 'savedQueries';
+              queryButton.dataset.query = q.sql;
+              queryButton.onclick = insertQuery;
+              queryFrame.appendChild(queryButton);
+            });
 
           }
 
