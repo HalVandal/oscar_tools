@@ -1323,6 +1323,37 @@ ORDER BY main_query.provider_no, main_query.latest_created desc, main_query.type
 });
 
 
+// Attachment Manager "Check Documents" troubleshooter.
+// The page is an Angular hash route, so it can be reached without a full page load;
+// listen for fragment/history changes too. attachmentChecker.js guards against double injection.
+function injectAttachmentChecker(details) {
+  if (details.frameId !== 0 || !details.url.includes('attachment-manager')) return;
+  chrome.scripting.executeScript({
+    target: { tabId: details.tabId },
+    files: ['attachmentChecker.js']
+  });
+}
+const attachmentCheckerFilter = { url: [{ hostSuffix: "oscar.com" }] };
+chrome.webNavigation.onCompleted.addListener(injectAttachmentChecker, attachmentCheckerFilter);
+chrome.webNavigation.onReferenceFragmentUpdated.addListener(injectAttachmentChecker, attachmentCheckerFilter);
+chrome.webNavigation.onHistoryStateUpdated.addListener(injectAttachmentChecker, attachmentCheckerFilter);
+
+// The checker needs the Authorization header the Angular app adds to its API calls.
+// Put attachmentSessionHook.js into the page's own JS world as the document starts loading,
+// before the app boots, so it can note that header (see that file).
+chrome.webNavigation.onCommitted.addListener(function(details) {
+  if (details.frameId !== 0 || !details.url.includes('/kaiemr/')) return;
+  chrome.scripting.executeScript({
+    target: { tabId: details.tabId },
+    files: ['attachmentSessionHook.js'],
+    world: 'MAIN',
+    injectImmediately: true
+  }).catch(function(e) {
+    console.error('[Oscar Tools] Could not add the document checker session hook:', e);
+  });
+}, attachmentCheckerFilter);
+
+
 chrome.windows.onCreated.addListener(function(newWindow) {
   chrome.storage.sync.get(null, function(result) {
     if (!result.toggleTabs) return; // Do nothing if disabled
