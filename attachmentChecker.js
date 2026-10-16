@@ -122,6 +122,20 @@
     return entries.length ? entries[entries.length - 1] : null;
   }
 
+  // Opened from a consultation the page URL carries the patient/provider numbers
+  // (#/attachment-manager?demographicNumber=..&providerNumber=..&mode=consultation)
+  // but the list is loaded differently, so build the eChart-style list URL from them.
+  function buildListUrlFromHash() {
+    const query = location.hash.split('?')[1];
+    if (!query) return null;
+    const params = new URLSearchParams(query);
+    const demographicNo = params.get('demographicNumber');
+    const providerNo = params.get('providerNumber');
+    if (!demographicNo || !providerNo) return null;
+    return location.origin + '/kaiemr/api/v1/attachment-manager/printable?demographicNumber=' +
+      encodeURIComponent(demographicNo) + '&providerNumber=' + encodeURIComponent(providerNo);
+  }
+
   // Authorization header + list URL noted by attachmentSessionHook.js from the page's own API calls
   function getSession() {
     return new Promise(resolve => {
@@ -279,7 +293,8 @@
 
     try {
       const session = await getSession();
-      const listUrl = session.listUrl || findListUrlInPage();
+      // Page URL first when it names the patient, so a list captured for an earlier patient can't be reused
+      const listUrl = buildListUrlFromHash() || session.listUrl || findListUrlInPage();
       if (!session.auth || !listUrl) {
         const missing = [!session.auth && 'login header', !listUrl && 'document list'].filter(Boolean).join(' and ');
         finishPanel(panel, `Could not pick up the page session (missing ${missing}). Refresh this page (F5) and try again.`);
@@ -360,14 +375,20 @@
       if (existing) existing.remove();
       return;
     }
-    if (existing && existing.isConnected) return;
+    const inlineOk = existing && existing.isConnected && existing.classList.contains('oac-inline');
+    if (inlineOk) return;
 
     injectStyles();
     // Sit next to the PRINT / FAX / EMAIL / SAVE FOR OCEAN buttons. Those are <weg-button-*>
     // components with encapsulated styles, so insert after the outer component and style our own.
     const ocean = document.querySelector('[data-pendo-id="attachment-manager-save-for-ocean-button"]');
-    const anchorBtn = findButtonByText(/save for ocean/i) || findButtonByText(/^print$/i);
+    // Consultation mode only has a SAVE button
+    const anchorBtn = findButtonByText(/save for ocean/i) || findButtonByText(/^print$/i) || findButtonByText(/^save$/i);
     const anchor = ocean || (anchorBtn && (anchorBtn.closest('weg-button-basic-with-icon') || anchorBtn));
+    if (existing && existing.isConnected) {
+      if (!anchor) return; // keep the floating button until the toolbar shows up
+      existing.remove();   // toolbar rendered after we fell back - move next to it
+    }
     if (!anchor && !document.querySelector('i.fa-eye')) return; // page not rendered yet
 
     const btn = document.createElement('button');
