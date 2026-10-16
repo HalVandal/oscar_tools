@@ -88,25 +88,54 @@
     return text.split('\n').map(s => s.trim()).filter(Boolean)[0] || '';
   }
 
+  function getRowDate(row) {
+    const m = (row.innerText || '').match(HAS_DATE);
+    return m ? m[0] : '';
+  }
+
+  // API dates are epoch ms; the page shows them as local YYYY-MM-DD
+  function formatDate(ms) {
+    if (ms == null || ms === '') return '';
+    const d = new Date(Number(ms));
+    if (isNaN(d)) return '';
+    const pad = n => String(n).padStart(2, '0');
+    return d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate());
+  }
+
+  function docName(doc) {
+    return (doc.name || '').trim();
+  }
+
   function isRowSelected(row) {
     const cb = row.querySelector('input[type="checkbox"], [role="checkbox"]');
     if (!cb) return false;
     return cb.checked === true || cb.getAttribute('aria-checked') === 'true';
   }
 
-  // Rows in the Documents section, keyed by trimmed name, so API results can be
-  // highlighted on the page and so ticked rows can limit the check.
+  // Rows in the Documents section, so API results can be highlighted on the page and
+  // ticked rows can limit the check. Keyed by name + date because names repeat; the
+  // name-only map is a fallback in case a date doesn't line up (e.g. timezone).
   function collectDocumentRows() {
     const container = document.querySelector('[data-pendo-id="category-Document"]');
+    const byKey = new Map();
     const byName = new Map();
-    if (!container) return byName;
-    container.querySelectorAll('i.fa-eye').forEach(icon => {
-      const row = getRowForIcon(icon);
-      const name = getRowName(row);
-      if (!byName.has(name)) byName.set(name, []);
-      byName.get(name).push(row);
-    });
-    return byName;
+    const add = (map, key, row) => {
+      if (!map.has(key)) map.set(key, []);
+      map.get(key).push(row);
+    };
+    if (container) {
+      container.querySelectorAll('i.fa-eye').forEach(icon => {
+        const row = getRowForIcon(icon);
+        const name = getRowName(row);
+        add(byKey, name + '|' + getRowDate(row), row);
+        add(byName, name, row);
+      });
+    }
+    return {
+      rowsFor(doc) {
+        return byKey.get(docName(doc) + '|' + formatDate(doc.date)) || byName.get(docName(doc)) || [];
+      }
+    };
   }
 
   function getCookie(name) {
@@ -264,10 +293,11 @@
     const el = document.createElement('div');
     el.className = 'oac-item' + (result.level === 'warn' ? ' oac-warn' : '');
     const title = document.createElement('div');
-    title.textContent = (result.level === 'bad' ? '⛔ ' : '⚠ ') + (doc.name || '').trim();
+    title.textContent = (result.level === 'bad' ? '⛔ ' : '⚠ ') + docName(doc);
     const id = document.createElement('span');
     id.className = 'oac-id';
-    id.textContent = '  (document id ' + doc.id + ')';
+    const date = formatDate(doc.date);
+    id.textContent = '  (' + (date ? date + ', ' : '') + 'document id ' + doc.id + ')';
     title.appendChild(id);
     const reason = document.createElement('div');
     reason.className = 'oac-reason';
@@ -318,11 +348,10 @@
         expandAll.click();
         await new Promise(r => setTimeout(r, 800));
       }
-      const rowsByName = collectDocumentRows();
-      const selectedNames = new Set();
-      rowsByName.forEach((rows, name) => { if (rows.some(isRowSelected)) selectedNames.add(name); });
-      const scope = selectedNames.size ? 'selected' : 'all';
-      if (selectedNames.size) docs = docs.filter(d => selectedNames.has((d.name || '').trim()));
+      const rows = collectDocumentRows();
+      const selected = docs.filter(d => rows.rowsFor(d).some(isRowSelected));
+      const scope = selected.length ? 'selected' : 'all';
+      if (selected.length) docs = selected;
 
       if (!docs.length) {
         finishPanel(panel, 'No printable Documents found for this patient.');
@@ -343,9 +372,9 @@
         done++;
         if (result.level !== 'ok') {
           flagged++;
-          const rows = rowsByName.get((doc.name || '').trim()) || [];
-          if (result.level === 'bad') rows.forEach(r => r.classList.add(FLAG_CLASS));
-          addResult(panel, doc, rows, result);
+          const docRows = rows.rowsFor(doc);
+          if (result.level === 'bad') docRows.forEach(r => r.classList.add(FLAG_CLASS));
+          addResult(panel, doc, docRows, result);
         }
         setStatus(panel, `Checking ${done} of ${docs.length} ${scope} Documents... (${flagged} flagged)`, done, docs.length);
       });
